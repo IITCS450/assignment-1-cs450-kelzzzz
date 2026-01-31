@@ -19,13 +19,16 @@ int main(int c, char **v)
 	}
 	//todo extend to all required printouts
 	//todo modify function to accept string pattern (instead of long)
-	long vmrss_kb = get_proc_long(v[1],"VmRSS: %ld kB");
-	DEBUG("%ld kb\n",vmrss_kb);
+
+	char state_buffer[256];
+	printf("PID: %s\n",v[1]);
+	printf("PPID: %ld\n", get_proc_long(v[1],"PPid: %ld"));
+	printf("State: %s\n", get_proc_string(v[1],"State:%s",state_buffer, sizeof(state_buffer)));
+	printf("%ld kb\n", get_proc_long(v[1],"VmRSS: %ld kB"));
 	return 0;
 }
 
 /*--helper functions*/
-//todo create function prototypes, move below main
 static void usage(const char *a){
 	fprintf(stderr,"Usage: %s <pid>\n",a); 
 	exit(1);
@@ -42,7 +45,7 @@ static long get_proc_long(const char *pid, const char *pattern){
 	char proc_file[100];
     build_proc_path(proc_file, pid);
 
-	INFO("Opening proc file with path: %s", proc_file);
+	DEBUG("Opening proc file with path: %s, searching for %s", proc_file, pattern);
 
 	FILE* file = fopen(proc_file,"r");
 
@@ -59,6 +62,26 @@ static long get_proc_long(const char *pid, const char *pattern){
 
     fclose(file);
 	return pattern_matched_value;
+}
+
+static char* get_proc_string(const char *pid, const char *pattern, char *output_buffer, size_t buffer_size) {
+    char proc_file[100];
+    build_proc_path(proc_file, pid);
+
+    FILE* file = fopen(proc_file, "r");
+    exit_if_file_not_exists(file);
+
+    char *result = NULL;
+
+    while (not_file_end(file)) {
+        if (sscanf(LINE, pattern, output_buffer) == 1) {
+            result = output_buffer;
+            break;
+        }
+    }
+
+    fclose(file);
+    return result;
 }
 
 char *not_file_end(FILE *file)
