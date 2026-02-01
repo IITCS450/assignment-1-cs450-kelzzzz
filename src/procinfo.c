@@ -42,7 +42,7 @@ int main(int c, char **v)
     return 0;
 }
 
-void check_pid_exists()
+static void check_pid_exists()
 {
     kill((pid_t)atoi(v[1]), 0);
     if (errno == ESRCH)
@@ -53,7 +53,7 @@ void check_pid_exists()
     }
 }
 
-void print_info(char **v, char state_buffer[256], char cmd_buffer[256], double cputime_sec)
+static void print_info(char **v, char state_buffer[256], char cmd_buffer[256], double cputime_sec)
 {
     printf("PID: %s\n", v[1]);
     printf("State: %s\n", get_proc_string(v[1], "status", "State:%s", state_buffer));
@@ -127,7 +127,7 @@ static char* get_proc_string(const char *pid, const char *dir, const char *patte
     return result;
 }
 
-char *not_file_end(FILE *file)
+static char *not_file_end(FILE *file)
 {
     return fgets(LINE, LINE_SIZE, file);
 }
@@ -143,7 +143,7 @@ static void exit_if_file_not_exists(FILE *file){
 	}
 }
 
-void build_proc_path(char proc_file[100], const char *dir, const char *pid)
+static void build_proc_path(char proc_file[100], const char *dir, const char *pid)
 {
 	snprintf(proc_file, 100, "/proc/%s/%s", pid, dir);
 }
