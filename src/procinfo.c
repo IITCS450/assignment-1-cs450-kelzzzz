@@ -27,7 +27,7 @@ int main(int c, char **v)
     if(c!=2 || !isnum(v[1])){ 
 		usage(v[0]);
 	}
-    check_pid_exists();
+    check_pid_exists(v[1]);
 
 	char state_buffer[256];
 	char cmd_buffer[256];
@@ -42,12 +42,12 @@ int main(int c, char **v)
     return 0;
 }
 
-static void check_pid_exists()
+void check_pid_exists(char *v)
 {
-    kill((pid_t)atoi(v[1]), 0);
+    kill((pid_t)atoi(v), 0);
     if (errno == ESRCH)
     {
-        ERR("PID does not exist.");
+        ERR("PID %s does not exist.", v);
         fprintf(stderr, "PID not found, terminating.\n");
         exit(1);
     }
